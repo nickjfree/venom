@@ -18,18 +18,18 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="tuntap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="venom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="venom.cpp">
+    <ClCompile Include="tuntap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
