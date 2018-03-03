@@ -33,7 +33,7 @@ done
 Now you can find a "TAP-Windows Adapter V9" adapter in your adapter list and it should be up and running.
 The default ip address for this adapter is set to 192.168.0.1 . Then you can setup routing to make 192.168.0.2, the server address as your default gateway and delete the old default gw. This makes all the traffic goes through the TAP interface except the real udp traffic.
 ```sh
- c:\> route add [serverip]/32 192.168.0.1
+ c:\> route add [serverip]/32 [your default gw]
  c:\> route add 0.0.0.0/0 192.168.0.2 
  c:\> route delete 0.0.0.0/0 [your default gw]
 ```
