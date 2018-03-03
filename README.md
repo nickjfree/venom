@@ -22,7 +22,7 @@ $ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 done
 
-#ing## Client Setup
+### Client Setup
   Windows
 
   - Firtst install Tap-windows driver (NDIS 6)
