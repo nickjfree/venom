@@ -22,7 +22,7 @@ $ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 done
 
-### Client Setup
+#ing## Client Setup
   Windows
 
   - Firtst install Tap-windows driver (NDIS 6)
@@ -62,7 +62,7 @@ $ ip link set tun1 up
 $ ip addr add 192.168.0.2/24 dev tun1
 ```
 
-After add some fancy routings. 
+After adding some fancy routings. 
 Done.
 
 Just remember. Anytime you get lost a good dns server always saves your ass.
