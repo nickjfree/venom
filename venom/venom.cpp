@@ -16,18 +16,6 @@ typedef struct Context {
 }Context;
 
 
-int setup_socket(sockaddr_in * remote) {
-
-	WSADATA wsadata = {};
-	WSAStartup(0x201, &wsadata);
-	SOCKET net_fd = socket(AF_INET, SOCK_DGRAM, 0);
-	remote->sin_family = AF_INET;
-	inet_pton(AF_INET, "47.89.31.171", &remote->sin_addr);
-	remote->sin_port = htons(55555);
-	return net_fd;
-}
-
-
 int worker_thread() {
 	while (1) {
 		int ret = 0;
