@@ -17,6 +17,11 @@
 #include <pthread.h>
 
 
+
+struct sockaddr_in nodes[256];
+
+
+
 int tun_alloc(char *dev, int flags) {
 
   struct ifreq ifr;
@@ -112,21 +117,34 @@ int main(int argc, char **argv) {
       } 
 //      printf("select return %d\n", ret);
       if (FD_ISSET(tun_fd, &rd_set)) {
-         int nread = 0;
+         int nread = 0, index;
          char buff[2048];
          nread = read(tun_fd, buff, 2048);
-         printf("read %d btyes data\n", nread);
-         nread = sendto(net_fd, buff, nread, 0, (struct sockaddr *)&remote, remote_len);
-         printf("send %d btye \n", nread);
+         unsigned int dst_ip =  *(unsigned int*)(buff + 16);
+         printf("read %d btyes data, dst ip %d\n", nread, dst_ip);
+         index = ntohl(dst_ip) & 0xff;
+         struct sockaddr_in * addr = &nodes[index];
+         if (argc == 2) {
+             addr = &remote;
+         }
+         nread = sendto(net_fd, buff, nread, 0, (struct sockaddr *)addr, sizeof(struct sockaddr_in));
+         printf("send %d btye to %s index %d\n", nread, inet_ntoa(addr->sin_addr), index);
       }
       if (FD_ISSET(net_fd, &rd_set)) {
-        int nread = 0;
+        int nread = 0, index;
         char buff[2048];
         //struct sockaddr_in remote;
         nread = recvfrom(net_fd, buff, 2048, 0, (struct sockaddr *)&remote, &remote_len);
-        printf("recv %d bytes from %s\n", nread, inet_ntoa(remote.sin_addr));
-        nread = write(tun_fd, buff, nread);
-        printf("tun %d bytes\n", nread);
+        // make sure it is a valid packet
+        if (nread > 1) {
+            unsigned int src_ip = *(unsigned int*)(buff + 12);
+            index = ntohl(src_ip) & 0xff;
+            struct sockaddr_in * addr = &nodes[index];
+            memcpy(addr, &remote, sizeof(struct sockaddr_in));
+            printf("recv %d bytes from %s, with src ip %d index %d\n", nread, inet_ntoa(addr->sin_addr), src_ip, index);
+            nread = write(tun_fd, buff, nread);
+            printf("tun %d bytes\n", nread);
+        }
       }  
       
    }
