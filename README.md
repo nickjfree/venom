@@ -69,7 +69,6 @@ Just remember. Anytime you get lost a good dns server always saves your ass.
 
 #### Limitations
 
-  - Venom only support one client at a time. If multiple client are using the same server expect unpredictable behaviors.
   - The windows version use a hardcoded 192.168.0.1 as the local client address. so you may need to change it in the code.
   - Be carefull with the routing setup on windows you may lose network connections. Be happy to restart.
 
