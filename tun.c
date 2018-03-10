@@ -19,7 +19,7 @@
 
 
 struct sockaddr_in nodes[256];
-
+unsigned int key = 0xaabbccdd; 
 
 
 int tun_alloc(char *dev, int flags) {
@@ -73,6 +73,15 @@ int setup_socket(int flag) {
    return s;
 }
 
+void transform(char * buff, unsigned int len, unsigned int key) {
+	int  i = 0;
+	int * value = (int*)buff;
+	while (i < len) {
+		value = (int*)(buff + i);
+		*value = *value ^ key;
+		i += sizeof(int);
+	}
+}
 
 int main(int argc, char **argv) {
 
@@ -127,6 +136,7 @@ int main(int argc, char **argv) {
          if (argc == 2) {
              addr = &remote;
          }
+         transform(buff, nread, key);
          nread = sendto(net_fd, buff, nread, 0, (struct sockaddr *)addr, sizeof(struct sockaddr_in));
          printf("send %d btye to %s index %d\n", nread, inet_ntoa(addr->sin_addr), index);
       }
@@ -137,6 +147,7 @@ int main(int argc, char **argv) {
         nread = recvfrom(net_fd, buff, 2048, 0, (struct sockaddr *)&remote, &remote_len);
         // make sure it is a valid packet
         if (nread > 1) {
+            transform(buff, nread, key);
             unsigned int src_ip = *(unsigned int*)(buff + 12);
             index = ntohl(src_ip) & 0xff;
             struct sockaddr_in * addr = &nodes[index];
