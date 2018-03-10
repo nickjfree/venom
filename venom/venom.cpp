@@ -13,19 +13,21 @@ typedef struct Context {
 	int sent;
 	HANDLE tun_fd;
 	sockaddr_in remote;
+	unsigned int key;
 }Context;
 
 
-int setup_socket(sockaddr_in * remote) {
 
-	WSADATA wsadata = {};
-	WSAStartup(0x201, &wsadata);
-	SOCKET net_fd = socket(AF_INET, SOCK_DGRAM, 0);
-	remote->sin_family = AF_INET;
-	inet_pton(AF_INET, "47.52.77.83", &remote->sin_addr);
-	remote->sin_port = htons(55555);
-	return net_fd;
+void transform(char * buff, unsigned int len, unsigned int key) {
+	int  i = 0;
+	int * value = (int*)buff;
+	while (i < len) {
+		value = (int*)(buff + i);
+		*value = *value ^ key;
+		i += sizeof(int);
+	}
 }
+
 
 
 int worker_thread() {
@@ -51,6 +53,7 @@ int worker_thread() {
 					memset(&Operation->overlapped, 0, sizeof(OVERLAPPED));
 					Operation->transferred = 0;
 					Operation->Type = PipeOperation::SEND_NET;
+					transform(Operation->buffer, Transferred, context->key);
 					Buffer.buf = Operation->buffer;
 					Buffer.len = Transferred;
 					ret = WSASendTo(context->net_fd, &Buffer, 1, &Operation->transferred, 0, (sockaddr*)&context->remote, sizeof(context->remote), &Operation->overlapped, NULL);
@@ -58,6 +61,7 @@ int worker_thread() {
 				case PipeOperation::RECV_NET:
 					printf("recv net %d\n", Transferred);
 					memset(&Operation->overlapped, 0, sizeof(OVERLAPPED));
+					transform(Operation->buffer, Transferred, context->key);
 					Operation->transferred = 0;
 					Operation->Type = PipeOperation::SEND_TUN;
 					WriteFile(context->tun_fd, Operation->buffer, Transferred, &Operation->transferred, &Operation->overlapped);
@@ -104,6 +108,8 @@ int main(int argc, char **argv) {
 	context.tun_fd = dev.tun_fd;
 	context.remote.sin_family = AF_INET;
 	context.remote_len = sizeof(sockaddr_in);
+	inet_pton(AF_INET, "192.168.0.1", &context.key);
+	context.key = 0xaabbccdd;
 	inet_pton(AF_INET, argv[1], &context.remote.sin_addr);
 	context.remote.sin_port = htons(55555);
 	// add all fd to iocp
