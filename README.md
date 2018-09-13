@@ -1,6 +1,6 @@
 # Venom
 
- Venom is an udp based tun implementation.  Deadlly simple but has incredible powers.
+ Venom is an udp based tun implementation.  Deadlly simple but has incredible power.
  
 ### Server Setup
 
